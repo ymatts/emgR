@@ -1,0 +1,13 @@
+Package: emgR
+Type: Package
+Title: surface electromyography (sEMG) analyzer with R
+Version: 0.1.0
+Author: Yusuke Matsui
+Maintainer: Yusuke Matsui <mail.to.matsui@gmail.com>
+Description: R package for analysis of sEMG data including basic signal preprocessing, muscle synergy analysis, coherence muscle network analysis, and network propagation analysis. 
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

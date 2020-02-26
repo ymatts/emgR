@@ -1,0 +1,183 @@
+---
+title: "emgR tutorials"
+author: "Yusuke Matsui"
+date: "1/2/2020"
+output: ioslides_presentation
+---
+
+## `emgR` overview
+- Analysis suites for surface electromyography (sEMG) data
+- Basic process functionality
+    - Bandpass filter
+    - Qunatification
+    - Normalization
+- Advanced analysis
+    - Waveform simililarity analysis
+        - Coherence analysis (incl. wavelet)
+        - Auto/cross correlation analysis
+    - Similiarity based muscle network analysis
+
+## Install emgR package
+```{r,warning=FALSE,message=F}
+# install.packages("devtools") if not installed
+ devtools::install_github("https://github.com/ymatts/emgR")
+#install.packages("~/Dropbox/matsui/git/emgR.tar.gz",repos = NULL,type = "source")
+library(emgR)
+```
+
+## Data acquisition
+- From [Santuz et al. (2018)](https://www.frontiersin.org/articles/10.3389/fphys.2018.01509/full)
+- 13 muscles sEMG (1000 Hz) records during gait cycle
+- Time data will be required for constructing emgR object
+```{r,warning=F,message=F}
+data(emg)
+head(emg,3)
+```
+
+## Constructing object
+- `emgList` is a method for constructing emgR object
+- `emgList` object is simply a `list` data structure
+-  Input time (sec) and multi channel sEMG data
+    - Time is in row and Muscles are in colums
+
+```{r,warning=TRUE,message=FALSE}
+tt = emg$Time # Time record
+xx = emg[,-1] # EMG record
+obj = emgR::emgList(x = xx,t = tt)
+obj
+```
+
+## Add annotation
+- Annotation file must be following format
+    - `id` in first column may indicate one cycle or trial
+    - `type` in second column may indicate description of id
+    - `start` and `end` should be annotated/triggered time in second
+```{r}
+(f = system.file("extdata","gaitAnno.txt",package = "emgR"))
+head(read.table(f,header = T,sep="\t"),3)
+```
+
+## Add annotation
+- `addAnnotation` function adds indices in raw emg records with annotated time
+```{r}
+obj = emgR::addAnnotation(obj,annoFile = f)
+head(obj$annotation,3)
+```
+
+## Extract EMG signals followed by annotation
+```{r}
+
+```
+
+## Filtering sEMG signals
+- Bandpass filter using butterworth filter
+- Filtered objects will be overwride in `emgR`
+- Default setting is `order` 4 and `[5,200]` bandpass filter
+```{r,echo=T,warning=TRUE,message=FALSE}
+obj = emgR::btw(obj,order = 4,filtFreq = c(5,200))
+obj
+```
+
+## Normalize sEMG signals
+- Several normalizing methods will be implemted
+    - Default setting use simple Maximum Voluntary Contruct (MVC)
+```{r,echo=T,warning=F,message=F}
+obj = emgR::normalize(obj)
+obj
+```
+
+## Extract gait cycle
+- 41 gait cycles
+- Each line corresponds to a cycle
+    - First column is times during heel contact
+    - Second column is times during stance
+```{r,warning=F,message=F}
+load("data/cycleTime.rda")
+head(cycleTime)
+```
+
+
+
+## Waveform similiarity analysis
+- Coherence analysis
+    - Linear coherence / Wavelet coherence
+- Correlation analysis
+    - Auto/Cross-correlation, Distance correlation etc.
+- Default setting is linear coherence by `stats::spec.pgram()` function
+```{r,echo=T,warning=F,message=F}
+obj = emgR::coherence(obj)
+obj
+```
+
+## Visualize coherence function
+- Muscle $^times$ Muscle smoothed coherences are plotted
+- The plot is saved in file path with `files`
+- `cohRange` is which frequency range should be considered
+- This takes several time
+```{r,eval=F,warning=F,message=F}
+file_path = tempfile()
+plot(obj,type="coh",files = file_path,cohRange=c(0,100))
+```
+
+## Visualize coherence functions
+```{r,echo=F,warning=F,message=F,out.width="70%",fig.align="center"}
+knitr::include_graphics(file_path)
+```
+
+## Aggregate coherence function into means within frequency bands
+- Average aggregation by frequecies such as $\alpha$, $\beta$, $\gamma$ bands.
+- Frequency can be specified with `cohRange` by vector.
+    - Following example shows averaged coherence from 15 Hz to 20 Hz. 
+- Heatmap of aggregated coherence can be visulized by `plot.it` argument
+```{r,warning=F,message=F}
+obj = emgR::aggrCoh(obj,cohRange = c(15,20),plot.it = FALSE)
+obj
+```
+
+## Aggregate coherence function into means within frequency bands
+```{r,warning=F,message=F,out.width="90%",fig.align="center"}
+obj = emgR::aggrCoh(obj,cohRange = c(15,20),plot.it = TRUE)
+```
+
+
+## Coherent muscle network construction
+- Network is constructed via aggregated coherence
+- Two mode of networks:
+    - Weighted network can be constructed with `mode="weighted"`
+    - Not weighted network can be constructed with `mode="bin"`
+- Coherence is binarized with `thres` argument
+    - Default `thres` is `0.25`
+- You can visualize network via `plot.it` argument.
+```{r,warning=F,message=F}
+obj = emgR::cohNet(obj,mode = "bin",thres = 0.25,plot.it = FALSE)
+```
+
+## Coherent muscle network construction
+```{r,warning=F,message=F,out.width="90%",fig.align="center"}
+obj = emgR::cohNet(obj,mode = "bin",thres = 0.25,plot.it = TRUE)
+```
+
+## Network based muscle module detection
+- Muscle modules are found based on linkcomm pakcage ([Ahn et al. 2010]("https://arxiv.org/pdf/0903.3178.pdf"), [Becker et al. 2012]("http://bioinformatics.oxfordjournals.org/content/28/1/84.full"))
+- `plot.it` visualize module structure
+    - You can choose `plot.type` from `"member"` or `"graph"`
+- In this model, each muscle can belong to several modules (muti-membership)
+
+
+## Network based muscle module detection
+- In case of `plot.type = "graph"`
+```{r,warning=F,message=F}
+obj = emgR::moduleFinder(obj,plot.it = TRUE,plot.type = "graph")
+```
+
+## Network based muscle module detection
+- In case of `plot.type = "member"`
+```{r,warning=F,message=F}
+obj = emgR::moduleFinder(obj,plot.it = TRUE,plot.type = "member")
+```
+
+
+## Muscle synergy (2D-array)
+- Derive muscle synergy based on Non-negative matrix factorzation (NMF) algorithm
+
+
