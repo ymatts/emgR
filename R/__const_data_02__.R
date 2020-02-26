@@ -1,5 +1,5 @@
 
-home = "~/Dropbox/matsui/gitR/EMG/data/Example/"
+home = "~/BMHI Dropbox/Matsui Yusuke/matsui/git/emgR/"
 setwd(home)
 library(data.table)
 
@@ -8,10 +8,10 @@ load("inst/data/RAW_EMG.RData")
 cycs = 10
 #npoints = 200
 emg = vector("list",length(RAW_EMG))
-id = gsub("RAW_EMG_","",names(RAW_EMG))
-pid = sapply(strsplit(id,"_"),function(x)x[1])
-tid = sapply(strsplit(id,"_"),function(x)x[2])
-names(emg) = id
+ids = gsub("RAW_EMG_","",names(RAW_EMG))
+pid = sapply(strsplit(ids,"_"),function(x)x[1])
+tid = sapply(strsplit(ids,"_"),function(x)x[2])
+names(emg) = ids
 for(id in seq_along(RAW_EMG)){
   emg_data = RAW_EMG[[id]]
   emg_data$t = 0:(nrow(emg_data)-1)
@@ -50,8 +50,8 @@ for(id in seq_along(RAW_EMG)){
     swing = emg_data[idx2$st:idx2$ed,]
     #x1 = apply(stance,2,function(x)approx(x,method="linear",n = npoints/2))
     #x2 = apply(swing,2,function(x)approx(x,method="linear",n = npoints/2))
-    x1 = data.frame(pid=pid[id],tid=tid[id],seqid=id,cycle=i,phase="swing",Time = swing$Time,swing[,!colnames(swing)%in%c("Time","t")])
-    x2 = data.frame(pid = pid[id],tid=tid[id],seqid=id,cycle=i,phase="stance",Time = stance$Time,stance[,!colnames(stance)%in%c("Time","t")])
+    x1 = data.frame(pid = pid[id],tid=tid[id],seqid=idx1$st:idx1$ed,cycle=i,phase="stance",Time = stance$Time,stance[,!colnames(stance)%in%c("Time","t")])
+    x2 = data.frame(pid = pid[id],tid=tid[id],seqid=idx2$st:idx2$ed,cycle=i,phase="swing",Time = swing$Time,swing[,!colnames(swing)%in%c("Time","t")])
     cycle_emg[[i]] = rbind(x1,x2)
   }
   emg[[id]] = do.call(rbind,cycle_emg)

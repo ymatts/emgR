@@ -19,7 +19,7 @@ rectify = function(x){
 downSample = function(obj,freq = 250){
   xx = obj$filter$emg
   tt = obj$time
-  nn = obj$size$nrow * (freq / obj$frequency)
+  nn = round(obj$size$nrow * (freq / obj$frequency))
   approxOut = apply(obj$emg,2,function(x)approx(tt,x,method = "linear",n = nn))
   ttout = sapply(approxOut,function(x)x$x)[,1]
   xxout = sapply(approxOut,function(x)x$y)

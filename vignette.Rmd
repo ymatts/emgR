@@ -42,34 +42,13 @@ head(emg,3)
     - Time is in row and Muscles are in colums
 
 ```{r,warning=TRUE,message=FALSE}
-tt = emg$Time # Time record
-xx = emg[,-1] # EMG record
+dat = emg[emg$pid=="P0001",]
+dat = dat[dat$cycle==c(1,2),]
+tt = dat$Time # Time record
+xx = dat[,-c(1:6)] # EMG record
 obj = emgR::emgList(x = xx,t = tt)
 obj
 ```
-
-## Add annotation
-- Annotation file must be following format
-    - `id` in first column may indicate one cycle or trial
-    - `type` in second column may indicate description of id
-    - `start` and `end` should be annotated/triggered time in second
-```{r}
-(f = system.file("extdata","gaitAnno.txt",package = "emgR"))
-head(read.table(f,header = T,sep="\t"),3)
-```
-
-## Add annotation
-- `addAnnotation` function adds indices in raw emg records with annotated time
-```{r}
-obj = emgR::addAnnotation(obj,annoFile = f)
-head(obj$annotation,3)
-```
-
-## Extract EMG signals followed by annotation
-#```{r}
-#
-#```
-
 
 ## Filtering sEMG signals
 - Bandpass filter using butterworth filter
@@ -86,16 +65,6 @@ obj
 ```{r,echo=T,warning=F,message=F}
 obj = emgR::normalize(obj)
 obj
-```
-
-## Extract gait cycle
-- 41 gait cycles
-- Each line corresponds to a cycle
-    - First column is times during heel contact
-    - Second column is times during stance
-```{r,warning=F,message=F}
-load("inst/data/cycleTime.rda")
-head(cycleTime)
 ```
 
 
