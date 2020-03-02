@@ -19,24 +19,49 @@ filter = function(obj,
 
 }
 
-btw = function(obj,
+bandpass = function(obj,
                order = 4,
-               filtFreq = c(5,100)){
+               filtFreq = c(5,50)){
   xx = obj$emg
   tt = obj$time
   freq = obj$frequency
   normFreq = 2 * filtFreq / freq
 
-  pf = butter(order,normFreq,type = "pass",plane = "z")
+  pf1 = butter(order,normFreq,type = "pass",plane = "z")
 
-  #xx = rectify(xx)
-  xx = abs(xx)
   filt = apply(xx,2,function(x)filtfilt(pf,x))
+
+  filt = abs(filt)
   filt[filt < 0] = min(filt[filt>0])
   rownames(filt) = rownames(xx)
   colnames(filt) = colnames(xx)
   filt = data.frame(filt,check.names = F)
   obj$filter = list(emg = filt, param=list(order=order,filtFreq = filtFreq,filtType = "Butterwoth"))
+  obj
+}
+
+
+envelop = function(obj,
+                   order = 4,
+                   filtFreq = c(5,50)){
+  xx = obj$emg
+  tt = obj$time
+  freq = obj$frequency
+
+  fn = filtFreq / (freq/2)            # Normalise by the Nyquist frequency (f/2)
+  names(fn) = c("low","high")
+
+  HP = butter(order, fn["high"], type="high")
+  LP = butter(order, fn["low"], type="low")
+
+  filtHp = apply(xx,2,function(x)filtfilt(HP,x))
+  filtHp = abs(filtHp)
+  filtHpLp = apply(filtHp,2,function(x)filtfilt(LP,x))
+
+  envelope = filtHpLp
+  envelope[envelope < 0] = min(envelope[envelope > 0])
+  envelope = data.frame(envelope,check.names = F)
+  obj$filter = list(emg = envelope, param=list(order=order,filtFreq = filtFreq,filtType = "envelope"))
   obj
 }
 
