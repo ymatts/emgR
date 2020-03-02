@@ -29,7 +29,8 @@ btw = function(obj,
 
   pf = butter(order,normFreq,type = "pass",plane = "z")
 
-  xx = rectify(xx)
+  #xx = rectify(xx)
+  xx = abs(xx)
   filt = apply(xx,2,function(x)filtfilt(pf,x))
   filt[filt < 0] = min(filt[filt>0])
   rownames(filt) = rownames(xx)

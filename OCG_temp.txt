@@ -1,0 +1,18 @@
+#################################################
+# Graph file OCG_input.txt has 4 Vertices and 2 edges
+# Rate of edges: 0.1667
+# Rate of intraclass edges: 0.000
+#
+# Initial classes are: centered cliques
+# Fusion is according to: the average gain
+# Class System is: maximizing the modularity
+#################################################
+
+Unclustered nodes (4): 
+FL  ME  RF  VM  
+Multiclustered nodes (0):
+
+
+
+Final classes (0), Modularity = 0 (-0.2500):
+

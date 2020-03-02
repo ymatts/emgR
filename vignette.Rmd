@@ -43,7 +43,8 @@ head(emg,3)
 
 ```{r,warning=TRUE,message=FALSE}
 dat = emg[emg$pid=="P0001",]
-dat = dat[dat$cycle%in%1:2,]
+nCycle = 10
+dat = dat[dat$cycle %in% (1:nCycle),]
 tt = dat$Time # Time record
 xx = dat[,-c(1:6)] # EMG record
 obj = emgR::emgList(x = xx,t = tt)
@@ -130,7 +131,7 @@ obj = emgR::cohNet(obj,mode = "bin",thres = 0.3,plot.it = FALSE)
 
 ## Coherent muscle network construction
 ```{r,warning=F,message=F,out.width="90%",fig.align="center"}
-obj = emgR::cohNet(obj,mode = "bin",thres = 0.25,plot.it = TRUE)
+obj = emgR::cohNet(obj,mode = "bin",thres = 0.4,plot.it = TRUE)
 ```
 
 ## Network based muscle module detection
