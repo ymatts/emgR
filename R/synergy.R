@@ -1,9 +1,10 @@
 muscleSynergy2D.rankEst = function(obj){
-  xx = obj$filter$normalizedEmg
+  xx = obj$filter$emg
   tt = obj$time
   core = detectCores()
   nupper = round(ncol(xx) / 2)
   estimRank = nmf(xx,rank = 2:nupper,seed=123,.options=paste0("p",core))
+  obj$synergy$estimRank = estimRank
   plot(estimRank)
 }
 
@@ -15,5 +16,9 @@ muscleSynergy2D = function(obj,rank=4){
   nmfResult = nmf(xx,rank = rank,seed=123,.options=paste0("p",core))
   W = nmfResult@fit@W
   H = nmfResult@fit@H
-  obj$synergy = nmfResult
+  obj$synergy$W = nmfResult@fit@W
+  obj$synergy$H = nmfResult@fit@H
+  obj$synergy$rank = rank
+  obj
+
 }

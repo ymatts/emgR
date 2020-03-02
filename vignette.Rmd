@@ -43,7 +43,7 @@ head(emg,3)
 
 ```{r,warning=TRUE,message=FALSE}
 dat = emg[emg$pid=="P0001",]
-nCycle = 10
+nCycle = 3
 dat = dat[dat$cycle %in% (1:nCycle),]
 tt = dat$Time # Time record
 xx = dat[,-c(1:6)] # EMG record
@@ -51,19 +51,9 @@ obj = emgR::emgList(x = xx,t = tt)
 obj
 ```
 
-## Filtering sEMG signals
-- Bandpass filter using butterworth filter
-- Filtered objects will be overwride in `emgR`
-- Default setting is `order` 4 and `[5,200]` bandpass filter
-```{r,echo=T,warning=TRUE,message=FALSE}
-obj = emgR::btw(obj,order = 4,filtFreq = c(5,100))
-obj
-```
-
 ## Envelope
-- Bandpass filter using butterworth filter
+- Bandpass filter using linear envelope
 - Filtered objects will be overwride in `emgR`
-- Default setting is `order` 4 and `[5,200]` bandpass filter
 ```{r,echo=T,warning=TRUE,message=FALSE}
 obj = emgR::envelope(obj,order = 4,filtFreq = c(5,100))
 obj
@@ -78,94 +68,115 @@ obj = emgR::normalize(obj)
 obj
 ```
 
+## envelope
+```{r,echo=T,warning=F,message=F}
+matplot(obj$filter$emg,type="l")
+```
+
+
 ## Down sampling
 ```{r,echo=T,warning=F,message=F}
-obj = emgR::downSample(obj)
+obj = emgR::downSample(obj,freq = 100)
 obj
 ```
 
-
-## Waveform similiarity analysis
-- Coherence analysis
-    - Linear coherence / Wavelet coherence
-- Correlation analysis
-    - Auto/Cross-correlation, Distance correlation etc.
-- Default setting is linear coherence by `stats::spec.pgram()` function
+## Down sampled envelope
 ```{r,echo=T,warning=F,message=F}
-obj = emgR::coherence(obj)
-obj
+matplot(obj$filter$emg,type="l")
 ```
-
-## Visualize coherence function
-- Muscle $^times$ Muscle smoothed coherences are plotted
-- The plot is saved in file path with `files`
-- `cohRange` is which frequency range should be considered
-- This takes several time
-```{r,eval=F,warning=F,message=F}
-file_path = paste0(tempfile(tmpdir = "inst"),".pdf")
-plot.emgR(obj,type="coh",files = file_path,cohRange=c(0,100))
-```
-
-## Visualize coherence functions
-```{r,include=T,echo=F,warning=F,message=F,out.width="70%",fig.align="center"}
-knitr::include_graphics(file_path)
-```
-
-## Aggregate coherence function into means within frequency bands
-- Average aggregation by frequecies such as $\alpha$, $\beta$, $\gamma$ bands.
-- Frequency can be specified with `cohRange` by vector.
-    - Following example shows averaged coherence from 15 Hz to 20 Hz. 
-- Heatmap of aggregated coherence can be visulized by `plot.it` argument
-```{r,warning=F,message=F}
-obj = emgR::aggrCoh(obj,cohRange = c(15,20),plot.it = FALSE)
-obj
-```
-
-## Aggregate coherence function into means within frequency bands
-```{r,warning=F,message=F,out.width="90%",fig.align="center"}
-obj = emgR::aggrCoh(obj,cohRange = c(15,20),plot.it = TRUE)
-```
-
-
-## Coherent muscle network construction
-- Network is constructed via aggregated coherence
-- Two mode of networks:
-    - Weighted network can be constructed with `mode="weighted"`
-    - Not weighted network can be constructed with `mode="bin"`
-- Coherence is binarized with `thres` argument
-    - Default `thres` is `0.25`
-- You can visualize network via `plot.it` argument.
-```{r,warning=F,message=F}
-obj = emgR::cohNet(obj,mode = "bin",thres = 0.3,plot.it = FALSE)
-```
-
-## Coherent muscle network construction
-```{r,warning=F,message=F,out.width="90%",fig.align="center"}
-obj = emgR::cohNet(obj,mode = "bin",thres = 0.4,plot.it = TRUE)
-```
-
-## Network based muscle module detection
-- Muscle modules are found based on linkcomm pakcage ([Ahn et al. 2010]("https://arxiv.org/pdf/0903.3178.pdf"), [Becker et al. 2012]("http://bioinformatics.oxfordjournals.org/content/28/1/84.full"))
-- `plot.it` visualize module structure
-    - You can choose `plot.type` from `"member"` or `"graph"`
-- In this model, each muscle can belong to several modules (muti-membership)
-
-
-## Network based muscle module detection
-- In case of `plot.type = "graph"`
-```{r,warning=F,message=F}
-obj = emgR::moduleFinder(obj,plot.it = TRUE,plot.type = "graph")
-```
-
-## Network based muscle module detection
-- In case of `plot.type = "member"`
-```{r,warning=F,message=F}
-obj = emgR::moduleFinder(obj,plot.it = TRUE,plot.type = "member")
-```
-
 
 ## Muscle synergy (2D-array)
 - Derive muscle synergy based on Non-negative matrix factorzation (NMF) algorithm
 ```{r,warning=F,message=F}
 
 ```
+
+
+<!-- ## Filtering sEMG signals -->
+<!-- - Bandpass filter using butterworth filter -->
+<!-- - Filtered objects will be overwride in `emgR` -->
+<!-- - Default setting is `order` 4 and `[5,200]` bandpass filter -->
+<!-- ```{r,echo=T,warning=TRUE,message=FALSE} -->
+<!-- obj = emgR::bandpass(obj,order = 4,filtFreq = c(5,100)) -->
+<!-- obj -->
+<!-- ``` -->
+
+<!-- ## Waveform similiarity analysis -->
+<!-- - Coherence analysis -->
+<!--     - Linear coherence / Wavelet coherence -->
+<!-- - Correlation analysis -->
+<!--     - Auto/Cross-correlation, Distance correlation etc. -->
+<!-- - Default setting is linear coherence by `stats::spec.pgram()` function -->
+<!-- ```{r,echo=T,warning=F,message=F} -->
+<!-- obj = emgR::coherence(obj) -->
+<!-- obj -->
+<!-- ``` -->
+
+<!-- ## Visualize coherence function -->
+<!-- - Muscle $^times$ Muscle smoothed coherences are plotted -->
+<!-- - The plot is saved in file path with `files` -->
+<!-- - `cohRange` is which frequency range should be considered -->
+<!-- - This takes several time -->
+<!-- ```{r,eval=F,warning=F,message=F} -->
+<!-- file_path = paste0(tempfile(tmpdir = "inst"),".pdf") -->
+<!-- plot.emgR(obj,type="coh",files = file_path,cohRange=c(0,100)) -->
+<!-- ``` -->
+
+<!-- ## Visualize coherence functions -->
+<!-- ```{r,include=T,echo=F,warning=F,message=F,out.width="70%",fig.align="center"} -->
+<!-- knitr::include_graphics(file_path) -->
+<!-- ``` -->
+
+<!-- ## Aggregate coherence function into means within frequency bands -->
+<!-- - Average aggregation by frequecies such as $\alpha$, $\beta$, $\gamma$ bands. -->
+<!-- - Frequency can be specified with `cohRange` by vector. -->
+<!--     - Following example shows averaged coherence from 15 Hz to 20 Hz.  -->
+<!-- - Heatmap of aggregated coherence can be visulized by `plot.it` argument -->
+<!-- ```{r,warning=F,message=F} -->
+<!-- obj = emgR::aggrCoh(obj,cohRange = c(15,20),plot.it = FALSE) -->
+<!-- obj -->
+<!-- ``` -->
+
+<!-- ## Aggregate coherence function into means within frequency bands -->
+<!-- ```{r,warning=F,message=F,out.width="90%",fig.align="center"} -->
+<!-- obj = emgR::aggrCoh(obj,cohRange = c(15,20),plot.it = TRUE) -->
+<!-- ``` -->
+
+
+<!-- ## Coherent muscle network construction -->
+<!-- - Network is constructed via aggregated coherence -->
+<!-- - Two mode of networks: -->
+<!--     - Weighted network can be constructed with `mode="weighted"` -->
+<!--     - Not weighted network can be constructed with `mode="bin"` -->
+<!-- - Coherence is binarized with `thres` argument -->
+<!--     - Default `thres` is `0.25` -->
+<!-- - You can visualize network via `plot.it` argument. -->
+<!-- ```{r,warning=F,message=F} -->
+<!-- obj = emgR::cohNet(obj,mode = "bin",thres = 0.3,plot.it = FALSE) -->
+<!-- ``` -->
+
+
+<!-- ## Coherent muscle network construction -->
+<!-- ```{r,warning=F,message=F,out.width="90%",fig.align="center"} -->
+<!-- obj = emgR::cohNet(obj,mode = "bin",thres = 0.4,plot.it = TRUE) -->
+<!-- ``` -->
+
+
+<!-- ## Network based muscle module detection -->
+<!-- - Muscle modules are found based on linkcomm pakcage ([Ahn et al. 2010]("https://arxiv.org/pdf/0903.3178.pdf"), [Becker et al. 2012]("http://bioinformatics.oxfordjournals.org/content/28/1/84.full")) -->
+<!-- - `plot.it` visualize module structure -->
+<!--     - You can choose `plot.type` from `"member"` or `"graph"` -->
+<!-- - In this model, each muscle can belong to several modules (muti-membership) -->
+
+
+<!-- ## Network based muscle module detection -->
+<!-- - In case of `plot.type = "graph"` -->
+<!-- ```{r,warning=F,message=F} -->
+<!-- obj = emgR::moduleFinder(obj,plot.it = TRUE,plot.type = "graph") -->
+<!-- ``` -->
+
+<!-- ## Network based muscle module detection -->
+<!-- - In case of `plot.type = "member"` -->
+<!-- ```{r,warning=F,message=F} -->
+<!-- obj = emgR::moduleFinder(obj,plot.it = TRUE,plot.type = "member") -->
+<!-- ``` -->
