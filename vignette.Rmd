@@ -43,7 +43,7 @@ head(emg,3)
 
 ```{r,warning=TRUE,message=FALSE}
 dat = emg[emg$pid=="P0001",]
-nCycle = 3
+nCycle = 2
 dat = dat[dat$cycle %in% (1:nCycle),]
 tt = dat$Time # Time record
 xx = dat[,-c(1:6)] # EMG record
@@ -87,9 +87,27 @@ matplot(obj$filter$emg,type="l")
 
 ## Muscle synergy (2D-array)
 - Derive muscle synergy based on Non-negative matrix factorzation (NMF) algorithm
+- This part is build on `NMF` package
+- `muscleSynergy2D.rankEst` explore best ranks
 ```{r,warning=F,message=F}
 obj = emgR::muscleSynergy2D.rankEst(obj)
-plot(obj$)
+plot(obj$synergy$estimRank)
+```
+
+## Muscle synergy (2D-array)
+- Perform NMF based on best fit rank
+- Show synergy basis
+```{r,warning=F,message=F}
+obj = emgR::muscleSynergy2D(obj,rank = 4)
+syns = 1:obj$synergy$rank
+matplot(obj$synergy$W,type="l",main="Synergy basis (W)",ylab="mv",xlab="normalized time")
+legend("topright",legend = paste("Synergy",syns),col=syns,lty = syns)
+```
+
+## Muscle synergy (2D-array)
+- Show synergy weight
+```{r,warning=F,message=F}
+pheatmap(obj$synergy$H,labels_row = paste("Synergy",syns))
 ```
 
 

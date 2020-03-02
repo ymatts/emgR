@@ -16,12 +16,14 @@ rectify = function(x){
   rxx
 }
 
-downSample = function(obj,freq = 200){
+downSample = function(obj,freq = NULL,nn=100){
   xx1 = obj$filter$emg
   xx2 = obj$filter$normalizedEmg
 
   tt = obj$time
-  nn = round(obj$size$nrow * (freq / obj$frequency))
+  if(!is.null(freq)){
+    nn = round(obj$size$nrow * (freq / obj$frequency))
+  }
 
   approxOut1 = apply(xx1,2,function(x)approx(tt,x,method = "linear",n = nn))
   ttout1 = sapply(approxOut1,function(x)x$x)[,1]
