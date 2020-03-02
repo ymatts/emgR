@@ -1,4 +1,4 @@
-emgList = function(x,t,name = colnames(x)){
+emgList = function(x,t,name = colnames(x),freq=1000){
   if(class(x) != "matrix"){x = as.matrix(x)}
   require(signal)
   require(ggplot2)
@@ -17,7 +17,9 @@ emgList = function(x,t,name = colnames(x)){
   xx = data.frame(x,check.names = F)
   tt = t
   tt2 = tt - tt[1]
-  freq = getFreq(tt2)
+  if(is.null(freq)){
+    freq = getFreq(tt2)
+  }
   colnames(xx) = name
   obj = list(emg=xx,
              size = size,

@@ -43,7 +43,7 @@ head(emg,3)
 
 ```{r,warning=TRUE,message=FALSE}
 dat = emg[emg$pid=="P0001",]
-dat = dat[dat$cycle==c(1,2),]
+dat = dat[dat$cycle%in%1:2,]
 tt = dat$Time # Time record
 xx = dat[,-c(1:6)] # EMG record
 obj = emgR::emgList(x = xx,t = tt)
@@ -64,6 +64,12 @@ obj
     - Default setting use simple Maximum Voluntary Contruct (MVC)
 ```{r,echo=T,warning=F,message=F}
 obj = emgR::normalize(obj)
+obj
+```
+
+## Down sampling
+```{r,echo=T,warning=F,message=F}
+obj = emgR::downSample(obj)
 obj
 ```
 
