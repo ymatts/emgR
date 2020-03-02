@@ -60,6 +60,16 @@ obj = emgR::btw(obj,order = 4,filtFreq = c(5,100))
 obj
 ```
 
+## Envelope
+- Bandpass filter using butterworth filter
+- Filtered objects will be overwride in `emgR`
+- Default setting is `order` 4 and `[5,200]` bandpass filter
+```{r,echo=T,warning=TRUE,message=FALSE}
+obj = emgR::envelope(obj,order = 4,filtFreq = c(5,100))
+obj
+```
+
+
 ## Normalize sEMG signals
 - Several normalizing methods will be implemted
     - Default setting use simple Maximum Voluntary Contruct (MVC)

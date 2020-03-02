@@ -41,7 +41,7 @@ bandpass = function(obj,
 }
 
 
-envelop = function(obj,
+envelope = function(obj,
                    order = 4,
                    filtFreq = c(5,50)){
   xx = obj$emg
