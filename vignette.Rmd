@@ -125,7 +125,7 @@ obj = emgR::aggrCoh(obj,cohRange = c(15,20),plot.it = TRUE)
     - Default `thres` is `0.25`
 - You can visualize network via `plot.it` argument.
 ```{r,warning=F,message=F}
-obj = emgR::cohNet(obj,mode = "bin",thres = 0.25,plot.it = FALSE)
+obj = emgR::cohNet(obj,mode = "bin",thres = 0.3,plot.it = FALSE)
 ```
 
 ## Coherent muscle network construction

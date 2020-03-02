@@ -16,25 +16,34 @@ rectify = function(x){
   rxx
 }
 
-downSample = function(obj,freq = 250){
-  xx = obj$filter$emg
+downSample = function(obj,freq = 200){
+  xx1 = obj$filter$emg
+  xx2 = obj$filter$normalizedEmg
+
   tt = obj$time
   nn = round(obj$size$nrow * (freq / obj$frequency))
-  approxOut = apply(obj$emg,2,function(x)approx(tt,x,method = "linear",n = nn))
-  ttout = sapply(approxOut,function(x)x$x)[,1]
-  xxout = sapply(approxOut,function(x)x$y)
-  rownames(xxout) = 1:nrow(xxout)
-  colnames(xxout) = colnames(xx)
 
-  # obj$time = ttout
-  # obj$emg = xxout
-  # obj$size$nrow = nrow(obj$emg)
-  # obj$size$ncol = ncol(obj$emg)
-  # obj$frequency = freq
-  # obj$start = ttout[1]
-  # obj$end = tail(ttout,1)
-  # obj$downsample = freq
-  # obj
+  approxOut1 = apply(xx1,2,function(x)approx(tt,x,method = "linear",n = nn))
+  ttout1 = sapply(approxOut1,function(x)x$x)[,1]
+  xxout1 = sapply(approxOut1,function(x)x$y)
+
+  approxOut2 = apply(xx2,2,function(x)approx(tt,x,method = "linear",n = nn))
+  ttout2 = sapply(approxOut2,function(x)x$x)[,1]
+  xxout2 = sapply(approxOut2,function(x)x$y)
+
+  rownames(xxout1) = rownames(xxout2) = 1:nrow(xxout1)
+  colnames(xxout1) = colnames(xxout2) = colnames(xx1)
+
+  obj$time = ttout
+  obj$filter$emg = xxout1
+  obj$filter$normalizedEmg = xxout2
+  obj$size$nrow = nrow(obj$emg)
+  obj$size$ncol = ncol(obj$emg)
+  obj$frequency = freq
+  obj$start = ttout[1]
+  obj$end = tail(ttout,1)
+  obj$downsample = freq
+  obj
 }
 
 addAnnotation = function(obj,ids=NULL,annoFile){
