@@ -15,6 +15,5 @@ muscleSynergy2D = function(obj,rank=4){
   nmfResult = nmf(xx,rank = rank,seed=123,.options=paste0("p",core))
   W = nmfResult@fit@W
   H = nmfResult@fit@H
-  matplot(W,type="l")
-  obj$synergy =
+  obj$synergy = nmfResult
 }
