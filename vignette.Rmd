@@ -88,7 +88,7 @@ matplot(obj$filter$emg,type="l")
 ## Muscle synergy (2D-array)
 - Derive muscle synergy based on Non-negative matrix factorzation (NMF) algorithm
 ```{r,warning=F,message=F}
-
+obj = emgR::muscleSynergy2D.rankEst(obj)
 ```
 
 
