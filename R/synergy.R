@@ -8,7 +8,7 @@ muscleSynergy2D.rankEst = function(obj,ranks=NULL){
   }
   estimRank = nmf(xx,rank = ranks,seed=123,.options=paste0("p",core))
   obj$synergy$estimRank = estimRank
-  plot(estimRank)
+  obj
 }
 
 
