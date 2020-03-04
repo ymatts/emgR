@@ -43,7 +43,7 @@ head(emg,3)
 
 ```{r,warning=TRUE,message=FALSE}
 dat = emg[emg$pid=="P0001",]
-nCycle = 2
+nCycle = 3
 dat = dat[dat$cycle %in% (1:nCycle),]
 tt = dat$Time # Time record
 xx = dat[,-c(1:6)] # EMG record
@@ -74,15 +74,15 @@ matplot(obj$filter$emg,type="l")
 ```
 
 
-## Down sampling
+## Normalized time (down sampling)
 ```{r,echo=T,warning=F,message=F}
-obj = emgR::downSample(obj,freq = 100)
+obj = emgR::downSample(obj,nn = 100)
 obj
 ```
 
-## Down sampled envelope
+## Envelope with normalized time
 ```{r,echo=T,warning=F,message=F}
-matplot(obj$filter$emg,type="l")
+matplot(obj$filter$emg,type="l",xlab="normalized time",ylab="mV")
 ```
 
 ## Muscle synergy (2D-array)
@@ -100,7 +100,7 @@ plot(obj$synergy$estimRank)
 ```{r,warning=F,message=F}
 obj = emgR::muscleSynergy2D(obj,rank = 4)
 syns = 1:obj$synergy$rank
-matplot(obj$synergy$W,type="l",main="Synergy basis (W)",ylab="mv",xlab="normalized time")
+matplot(obj$synergy$W,type="l",main="Synergy basis (W)",ylab="mV",xlab="normalized time")
 legend("topright",legend = paste("Synergy",syns),col=syns,lty = syns)
 ```
 
